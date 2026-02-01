@@ -1,0 +1,8 @@
+{
+  "name": "OmniClinic SaaS",
+  "description": "A comprehensive multi-tenant Clinic Management System with support for triage, doctor encounters, lab, pharmacy, billing, and inpatient modules, featuring full Arabic/English i18n and offline-first capabilities.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

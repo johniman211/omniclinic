@@ -1,0 +1,76 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- CORE HELPERS ---
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      // Assumes a /users collection where doc ID is auth.uid
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isMemberOf(clinicId) {
+      return isSignedIn() && getUserData().clinicId == clinicId;
+    }
+
+    function hasRole(roles) {
+      return isSignedIn() && getUserData().role in roles;
+    }
+
+    // --- TENANCY ISOLATION ---
+    
+    // Most collections follow this basic rule: Must belong to the clinic
+    match /{collection}/{docId} {
+      allow read: if isSignedIn() && (
+        resource.data.clinicId == getUserData().clinicId ||
+        getUserData().role == 'SuperAdmin'
+      );
+      
+      allow write: if isSignedIn() && (
+        (request.resource.data.clinicId == getUserData().clinicId) ||
+        getUserData().role == 'SuperAdmin'
+      );
+    }
+
+    // --- MODULE SPECIFIC RULES ---
+
+    // Patient records: High sensitivity
+    match /patients/{patientId} {
+      allow read: if isMemberOf(resource.data.clinicId);
+      allow create: if isSignedIn() && request.resource.data.clinicId == getUserData().clinicId;
+      allow update: if isMemberOf(resource.data.clinicId) && hasRole(['Admin', 'Doctor', 'Receptionist']);
+      allow delete: if false; // Archive instead of delete
+    }
+
+    // Medical Encounters: Locked after completion
+    match /visits/{visitId} {
+      allow read: if isMemberOf(resource.data.clinicId);
+      allow create: if isMemberOf(request.resource.data.clinicId);
+      allow update: if isMemberOf(resource.data.clinicId) && resource.data.status != 'Completed';
+    }
+
+    // Audit Logs: Strictly immutable, append-only
+    match /auditLogs/{logId} {
+      allow create: if isSignedIn(); 
+      allow read: if hasRole(['Admin', 'SuperAdmin']);
+      allow update, delete: if false;
+    }
+
+    // Clinic Settings: Only Admin/SuperAdmin
+    match /clinics/{clinicId} {
+      allow read: if isSignedIn(); // Basic info for onboarding
+      allow write: if hasRole(['Admin', 'SuperAdmin']) && (clinicId == getUserData().clinicId || getUserData().role == 'SuperAdmin');
+    }
+
+    // Global Registry (Users/Memberships)
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if (request.auth.uid == userId) || hasRole(['Admin', 'SuperAdmin']);
+    }
+  }
+}
