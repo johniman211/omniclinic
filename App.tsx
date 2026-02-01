@@ -62,7 +62,7 @@ const App: React.FC = () => {
       if (session) await handleSession(session);
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
       if (session) await handleSession(session);
       else {
         setSessionProfile(null);
@@ -84,7 +84,7 @@ const App: React.FC = () => {
         .select('*')
         .eq('id', session.user.id)
         .maybeSingle();
-      
+
       if (!profile) {
         const { data: newProfile, error: createError } = await supabase
           .from('profiles')
@@ -195,24 +195,24 @@ const App: React.FC = () => {
       logout: handleLogout
     }}>
       <div className={`min-h-screen flex bg-slate-50 ${dir === 'rtl' ? 'flex-row-reverse' : 'flex-row'}`}>
-        <Sidebar 
-          isOpen={true} 
-          setIsOpen={() => {}} 
-          activeTab={activeTab} 
+        <Sidebar
+          isOpen={true}
+          setIsOpen={() => { }}
+          activeTab={activeTab}
           setActiveTab={setActiveTab}
           role={currentRole}
         />
 
         <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-          <Header 
-            lang={lang} 
-            setLang={setLang} 
+          <Header
+            lang={lang}
+            setLang={setLang}
             userName={sessionProfile?.full_name || 'User'}
             role={currentRole}
             clinicName={currentClinic?.name || 'Clinic'}
             onLogout={handleLogout}
           />
-          
+
           <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto pb-12">
               {renderContent()}
