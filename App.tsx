@@ -19,6 +19,7 @@ import LoginView from './components/auth/LoginView';
 import OnboardingView from './components/auth/OnboardingView';
 import AIAssistantPage from './app/dashboard/ai/page';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { Organization, Profile } from './types';
 
 const AuthContext = createContext<{
@@ -62,7 +63,7 @@ const App: React.FC = () => {
       if (session) await handleSession(session);
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       if (session) await handleSession(session);
       else {
         setSessionProfile(null);
