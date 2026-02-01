@@ -167,9 +167,9 @@ const App: React.FC = () => {
           <div className="bg-slate-800/50 rounded-3xl p-6 border border-slate-700 text-left space-y-4">
             <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Required Variables</p>
             <ul className="space-y-3 font-mono text-[11px] text-slate-300">
-              <li className="flex items-center gap-2"><i className="fas fa-circle text-[6px] text-red-500"></i> NEXT_PUBLIC_SUPABASE_URL</li>
-              <li className="flex items-center gap-2"><i className="fas fa-circle text-[6px] text-red-500"></i> NEXT_PUBLIC_SUPABASE_ANON</li>
-              <li className="flex items-center gap-2 text-slate-500"><i className="fas fa-circle text-[6px]"></i> API_KEY (Optional for AI)</li>
+              <li className="flex items-center gap-2"><i className="fas fa-circle text-[6px] text-red-500"></i> VITE_SUPABASE_URL</li>
+              <li className="flex items-center gap-2"><i className="fas fa-circle text-[6px] text-red-500"></i> VITE_SUPABASE_ANON</li>
+              <li className="flex items-center gap-2 text-slate-500"><i className="fas fa-circle text-[6px]"></i> VITE_API_KEY (Optional for AI)</li>
             </ul>
           </div>
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
